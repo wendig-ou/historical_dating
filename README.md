@@ -1,8 +1,7 @@
 # HistoricalDating
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/historical_dating`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Parse human historical datings and convert them to Julian day ranges. The
+functionality was extracted from [ConedaKOR](https://github.com/coneda/kor).
 
 ## Installation
 
@@ -22,15 +21,23 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+~~~ruby
+hd = HistoryDating.parse("2. Jahrhundert nach Christus")
+hd.from
+# => #<Date: 0100-01-01 ((1757583j,0s,0n),+0s,2299161j)>
+hd.to
+# => #<Date: 0199-12-31 ((1794107j,0s,0n),+0s,2299161j)>
+hd.julian_range
+# => [1757583, 1794107]
+~~~
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/historical_dating.
+Bug reports and pull requests are welcome on GitHub at https://github.com/wendig-ou/historical_dating.
 

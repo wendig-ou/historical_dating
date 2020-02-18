@@ -6,8 +6,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Moritz Schepp"]
   spec.email         = ["moritz.schepp@gmail.com"]
 
-  spec.summary       = "parse human historical datings"
-  spec.description   = "parse human historical datings and convert them to Julian day ranges"
+  spec.summary       = "Parse human historical datings"
+  spec.description   = "Parse human historical datings and convert them to Julian day ranges"
   spec.homepage      = "https://github.com/wendig-ou/historical-dating"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 
@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/wendig-ou/historical-dating"
-  # spec.metadata["changelog_uri"] = "https://github.com/wendig-ou/historical-dating"
+  spec.metadata["changelog_uri"] = "https://github.com/wendig-ou/historical-dating/blob/master/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
