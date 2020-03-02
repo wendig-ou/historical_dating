@@ -22,7 +22,7 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:before){ str('vor') >> space }
   rule(:after){ str('nach') >> space }
   rule(:negate){ str('nicht') >> space }
-  rule(:part){ str('Anfang') | str('Mitte') | str('Ende') | str('1. Hälfte') | str('2. Hälfte') | str('1. Drittel') | str('2. Drittel') | str('3. Drittel') }
+  rule(:part){ str('Anfang') | str('Mitte') | str('Ende') | str('1. Hälfte') | str('2. Hälfte') | str('1. Drittel') | str('2. Drittel') | str('3. Drittel') | str('1. Viertel') | str('2. Viertel') | str('3. Viertel') | str('4. Viertel') }
 
   # Dating
 

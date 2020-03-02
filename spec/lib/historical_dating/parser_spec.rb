@@ -213,9 +213,13 @@ RSpec.describe HistoricalDating::Parser do
     expect(subject.transform("Ende 16. Jh.")).to eql(from: Date.new(1575, 1, 1), to: Date.new(1599, 12, 31))
     expect(subject.transform("1. Hälfte 16. Jh.")).to eql(from: Date.new(1500, 1, 1), to: Date.new(1549, 12, 31))
     expect(subject.transform("2. Hälfte 16. Jh.")).to eql(from: Date.new(1550, 1, 1), to: Date.new(1599, 12, 31))
-    expect(subject.transform("1. Drittel 16. Jh.")).to eql(from: Date.new(1500, 1, 1), to: Date.new(1533, 12, 31))
-    expect(subject.transform("2. Drittel 16. Jh.")).to eql(from: Date.new(1533, 1, 1), to: Date.new(1566, 12, 31))
+    expect(subject.transform("1. Drittel 16. Jh.")).to eql(from: Date.new(1500, 1, 1), to: Date.new(1532, 12, 31))
+    expect(subject.transform("2. Drittel 16. Jh.")).to eql(from: Date.new(1533, 1, 1), to: Date.new(1565, 12, 31))
     expect(subject.transform("3. Drittel 16. Jh.")).to eql(from: Date.new(1566, 1, 1), to: Date.new(1599, 12, 31))
+    expect(subject.transform("1. Viertel 8. Jh. v. Chr.")).to eql(from: Date.new(-799, 1, 1), to: Date.new(-775, 12, 31))
+    expect(subject.transform("2. Viertel 8. Jh. v. Chr.")).to eql(from: Date.new(-774, 1, 1), to: Date.new(-750, 12, 31))
+    expect(subject.transform("3. Viertel 8. Jh. v. Chr.")).to eql(from: Date.new(-749, 1, 1), to: Date.new(-725, 12, 31))
+    expect(subject.transform("4. Viertel 8. Jh. v. Chr.")).to eql(from: Date.new(-724, 1, 1), to: Date.new(-700, 12, 31))
   end
 
   it 'should deal with leap years' do

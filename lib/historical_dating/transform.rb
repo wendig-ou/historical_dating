@@ -6,9 +6,13 @@ class HistoricalDating::Transform < Parslet::Transform
     when "Ende" then [75, 0]
     when "1. Hälfte" then [0, 50]
     when "2. Hälfte" then [50, 0]
-    when "1. Drittel" then [0, 66]
-    when "2. Drittel" then [33, 33]
+    when "1. Drittel" then [0, 67]
+    when "2. Drittel" then [33, 34]
     when "3. Drittel" then [66, 0]
+    when "1. Viertel" then [0, 75]
+    when "2. Viertel" then [25, 50]
+    when "3. Viertel" then [50, 25]
+    when "4. Viertel" then [75, 0]
     end
 
     if bc.nil?
