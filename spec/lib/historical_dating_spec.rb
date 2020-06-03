@@ -4,7 +4,7 @@ RSpec.describe HistoricalDating do
   it 'should fail when an unsupported locale is passed' do
     expect{
       described_class.parse('something', locale: 'en')
-    }.to raise_error(HistoricalDating::Error){ |e| 
+    }.to raise_error(HistoricalDating::Error){ |e|
       expect(e.message).to eq('locale_not_supported')
       expect(e.data[:locale]).to eq('en')
     }
