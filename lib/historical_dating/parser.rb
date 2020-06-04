@@ -13,8 +13,8 @@ class HistoricalDating::Parser < Parslet::Parser
 
   rule(:space){ str(' ').repeat(1, nil) }
   rule(:christ){ str('Chr.') | str('Christus') }
-  rule(:age){ str('v.') | str('vor') }
-  rule(:bc){ age >> space >> christ }
+  rule(:age){ str('v.') | str('vor') | str('n.') | str('nach') }
+  rule(:acbc){ age >> space >> christ }
   rule(:century_string){ str('Jahrhundert') | str('Jh.') }
   rule(:approx){ str('ca.') | str('um') | str('circa') }
   rule(:unknown){ str('?') }
@@ -26,9 +26,9 @@ class HistoricalDating::Parser < Parslet::Parser
 
   # Dating
 
-  rule(:century){ (approx >> space).maybe.as(:approx) >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> bc).maybe.as(:bc) }
-  rule(:year){ (approx >> space).maybe.as(:approx) >> natural_number.as(:num) >> (space >> bc).maybe.as(:bc) }
-  rule(:century_part){ part.as(:part) >> space >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> bc).maybe.as(:bc) }
+  rule(:century){ (approx >> space).maybe.as(:approx) >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc) }
+  rule(:year){ (approx >> space).maybe.as(:approx) >> natural_number.as(:num) >> (space >> acbc).maybe.as(:acbc) }
+  rule(:century_part){ part.as(:part) >> space >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc) }
   rule(:european_date){ day.as(:day) >> str('.') >> month.as(:month) >> str('.') >> whole_number.as(:yearnum) }
   rule(:machine_date){ whole_number.as(:yearnum) >> (str('.') | str('-')) >> month.as(:month) >> (str('.') | str('-')) >> day.as(:day) }
   rule(:date){ european_date | machine_date }

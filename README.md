@@ -22,7 +22,7 @@ Or install it yourself as:
 ## Usage
 
 ~~~ruby
-hd = HistoryDating.parse("2. Jahrhundert nach Christus")
+hd = HistoricalDating.parse("2. Jahrhundert nach Christus")
 hd.from
 # => #<Date: 0100-01-01 ((1757583j,0s,0n),+0s,2299161j)>
 hd.to
@@ -40,4 +40,3 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/wendig-ou/historical_dating.
-

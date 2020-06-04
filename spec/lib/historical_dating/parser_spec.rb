@@ -53,6 +53,7 @@ RSpec.describe HistoricalDating::Parser do
   it "should parse century strings" do
     expect(subject.century).to parse('14. Jahrhundert')
     expect(subject.century).to parse('1. Jh. vor Christus')
+    expect(subject.century).to parse('2. Jahrhundert nach Christus')
     expect(subject.century).not_to parse('-1. Jh. v. Chr.')
   end
 
@@ -199,6 +200,25 @@ RSpec.describe HistoricalDating::Parser do
     expect(subject.transform('1877-01-23')).to eql(
       from: Date.new(1877, 1, 23),
       to: Date.new(1877, 1, 23)
+    )
+  end
+  
+  it "should parse explicit 'nach Christus'" do
+    expect(subject.transform('1. Drittel 1. Jahrhundert nach Christus')).to eql(
+      from: Date.new(0, 1, 1),
+      to: Date.new(32, 12, 31)
+    )
+    expect(subject.transform('2. Jahrhundert nach Christus')).to eql(
+      from: Date.new(100, 1, 1),
+      to: Date.new(199, 12, 31)
+    )
+    expect(subject.transform('455 nach Christus')).to eql(
+      from: Date.new(455, 1, 1),
+      to: Date.new(455, 12, 31)
+    )
+    expect(subject.transform('ca. 312 nach Christus')).to eql(
+      from: Date.new(307, 1, 1),
+      to: Date.new(317, 12, 31)
     )
   end
 

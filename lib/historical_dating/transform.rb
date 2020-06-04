@@ -1,5 +1,5 @@
 class HistoricalDating::Transform < Parslet::Transform
-  rule(:num => simple(:num), :part => simple(:part), :bc => simple(:bc), :cs => simple(:cs)) do
+  rule(:num => simple(:num), :part => simple(:part), :acbc => simple(:acbc), :cs => simple(:cs)) do
     modifier = case part
     when "Anfang" then [0, 75]
     when "Mitte" then [35, 35]
@@ -15,7 +15,7 @@ class HistoricalDating::Transform < Parslet::Transform
     when "4. Viertel" then [75, 0]
     end
 
-    if bc.nil?
+    if acbc.nil? || acbc.match(/(nach|n.) (Chr.|Christus)/)
       {
         :from => Date.new((num.to_i - 1) * 100 + modifier.first, 1, 1),
         :to => Date.new((num.to_i - 1) * 100 + 99 - modifier.last, 12, 31)
@@ -28,8 +28,8 @@ class HistoricalDating::Transform < Parslet::Transform
     end
   end
 
-  rule(:num => simple(:num), :approx => simple(:approx), :bc => simple(:bc), :cs => simple(:cs)) do
-    result = if bc.nil?
+  rule(:num => simple(:num), :approx => simple(:approx), :acbc => simple(:acbc), :cs => simple(:cs)) do
+    result = if acbc.nil? || acbc.match(/(nach|n.) (Chr.|Christus)/)
       {
         :from => Date.new((num.to_i - 1) * 100, 1, 1),
         :to => Date.new((num.to_i - 1) * 100 + 99, 12, 31)
@@ -49,10 +49,10 @@ class HistoricalDating::Transform < Parslet::Transform
     result
   end
 
-  rule(:num => simple(:num), :approx => simple(:approx), :bc => simple(:bc)) do
+  rule(:num => simple(:num), :approx => simple(:approx), :acbc => simple(:acbc)) do
     modifier = (approx ? 5 : 0)
 
-    if bc.nil?
+    if acbc.nil? || acbc.match(/(nach|n.) (Chr.|Christus)/)
       {
         :from => Date.new(num.to_i - modifier, 1, 1),
         :to => Date.new(num.to_i + modifier, 12, 31)
