@@ -84,6 +84,10 @@ class HistoricalDating::Transform < Parslet::Transform
     {:from => first_from, :to => last_to}
   end
 
+  rule(before_century: {from: simple(:from), to: simple(:to) }) do
+    {from: from - 100.years, to: to - 100.years}
+  end
+
   [:century, :date_interval, :year, :year_interval, :interval, :century_interval, :century_part].each do |key|
     rule(key => {:from => simple(:from), :to => simple(:to)}) do
       {:from => from, :to => to}

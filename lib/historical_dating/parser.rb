@@ -37,12 +37,14 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:before_year){ negate.maybe.as(:not) >> before >> year.as(:date) }
   rule(:after_year){ negate.maybe.as(:not) >> after >> year.as(:date) }
   rule(:year_interval){ year.as(:from) >> to >> (year | unknown).as(:to) | (year | unknown).as(:from) >> to >> year.as(:to) }
+  rule(:before_century){ before >> century.as(:century) }
   rule(:interval){
     before_year.as(:before_year) |
       after_year.as(:after_year) |
       date_interval.as(:date_interval) |
       century_interval.as(:century_interval) |
-      year_interval.as(:year_interval)
+      year_interval.as(:year_interval) |
+      before_century.as(:before_century)
   }
   rule(:dating){
     interval.as(:interval) |
