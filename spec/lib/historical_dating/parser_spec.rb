@@ -266,4 +266,20 @@ RSpec.describe HistoricalDating::Parser do
   it "should parse 'vor 5. Jh. vor Chr.'" do
     expect(subject.transform("vor 5. Jh. v. Chr.")).to eql(from: Date.new(-599, 1, 1), to: Date.new(-500, 12, 31))
   end
+
+  it "should parse '1808/1812'" do
+    expect(subject.transform("1808/1812")).to eql(from: Date.new(1808, 1, 1), to: Date.new(1812, 12, 31))
+  end
+
+  it "should parse '1230-1255'" do
+    expect(subject.transform("1230-1255")).to eql(from: Date.new(1230, 1, 1), to: Date.new(1255, 12, 31))
+  end
+
+  it "should parse '1230 - 1255'" do
+    expect(subject.transform("1230 - 1255")).to eql(from: Date.new(1230, 1, 1), to: Date.new(1255, 12, 31))
+  end
+
+  it "should parse '-480'" do
+    expect(subject.transform("-480")).to eql(from: Date.new(-480, 1, 1), to: Date.new(-480, 12, 31))
+  end
 end

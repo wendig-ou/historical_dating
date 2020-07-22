@@ -5,6 +5,7 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:natural_number){ match['1-9'] >> match['0-9'].repeat }
   rule(:positive_number){ zero | natural_number }
   rule(:minus){ match '-' }
+  rule(:whole_number_without_zero){ natural_number | minus >> natural_number }
   rule(:whole_number){ positive_number | minus >> natural_number }
   rule(:day){ match['1-2'] >> match['0-9'] | str('3') >> match['0-1'] | match['1-9'] | str('0') >> match['1-9'] }
   rule(:month){ str('1') >> match['0-2'] | match['1-9'] | str('0') >> match['1-9'] }
@@ -18,7 +19,7 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:century_string){ str('Jahrhundert') | str('Jh.') }
   rule(:approx){ str('ca.') | str('um') | str('circa') }
   rule(:unknown){ str('?') }
-  rule(:to){ space >> str('bis') >> space }
+  rule(:to){ ((space >> (str('bis') | str('-') | str('/')) >> space) | str('-') | str('/')) }
   rule(:before){ str('vor') >> space }
   rule(:after){ str('nach') >> space }
   rule(:negate){ str('nicht') >> space }
@@ -27,7 +28,7 @@ class HistoricalDating::Parser < Parslet::Parser
   # Dating
 
   rule(:century){ (approx >> space).maybe.as(:approx) >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc) }
-  rule(:year){ (approx >> space).maybe.as(:approx) >> natural_number.as(:num) >> (space >> acbc).maybe.as(:acbc) }
+  rule(:year){ (approx >> space).maybe.as(:approx) >> whole_number_without_zero.as(:num) >> (space >> acbc).maybe.as(:acbc) }
   rule(:century_part){ part.as(:part) >> space >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc) }
   rule(:european_date){ day.as(:day) >> str('.') >> month.as(:month) >> str('.') >> whole_number.as(:yearnum) }
   rule(:machine_date){ whole_number.as(:yearnum) >> (str('.') | str('-')) >> month.as(:month) >> (str('.') | str('-')) >> day.as(:day) }
