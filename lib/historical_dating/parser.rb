@@ -59,6 +59,8 @@ class HistoricalDating::Parser < Parslet::Parser
   # Transform
 
   def transform(input)
-    HistoricalDating::Transform.new.apply(self.class.new.parse(input))
+    result = self.class.new.parse(input)
+    result = HistoricalDating::PreTransform.new.apply(result)
+    HistoricalDating::Transform.new.apply(result)
   end
 end

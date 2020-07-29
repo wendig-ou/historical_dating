@@ -18,6 +18,7 @@ module HistoricalDating
 
   autoload :Api, 'historical_dating/api'
   autoload :Parser, 'historical_dating/parser'
+  autoload :PreTransform, 'historical_dating/pre_transform'
   autoload :Range, 'historical_dating/range'
   autoload :Transform, 'historical_dating/transform'
 

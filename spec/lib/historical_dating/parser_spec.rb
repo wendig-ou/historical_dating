@@ -266,4 +266,8 @@ RSpec.describe HistoricalDating::Parser do
   it "should parse 'vor 5. Jh. vor Chr.'" do
     expect(subject.transform("vor 5. Jh. v. Chr.")).to eql(from: Date.new(-599, 1, 1), to: Date.new(-500, 12, 31))
   end
+
+  it "should parse '340 bis 320 v. Chr.'" do
+    expect(subject.transform("340 bis 320 v. Chr.")).to eql(from: Date.new(-340, 1, 1), to: Date.new(-320, 12, 31))
+  end
 end
