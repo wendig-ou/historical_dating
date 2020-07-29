@@ -90,6 +90,10 @@ class HistoricalDating::Transform < Parslet::Transform
 
   [:century, :date_interval, :year, :year_interval, :interval, :century_interval, :century_part].each do |key|
     rule(key => {:from => simple(:from), :to => simple(:to)}) do
+      if to < from
+        raise HistoricalDating::Error.new('from_later_than_to')
+      end
+
       {:from => from, :to => to}
     end
   end

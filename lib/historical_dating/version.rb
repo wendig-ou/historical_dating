@@ -1,3 +1,3 @@
 module HistoricalDating
-  VERSION = "1.2.1"
+  VERSION = "1.3.2"
 end
