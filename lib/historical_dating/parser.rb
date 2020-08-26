@@ -19,15 +19,36 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:century_string){ str('Jahrhundert') | str('Jh.') }
   rule(:approx){ str('ca.') | str('um') | str('circa') }
   rule(:unknown){ str('?') }
-  rule(:to){ ((space >> (str('bis') | str('-') | str('/')) >> space) | str('-') | str('/')) }
+  rule(:to){
+    ((space >> (str('bis') | str('-') | str('/')) >> space) |
+    str('-') |
+    str('/'))
+  }
   rule(:before){ str('vor') >> space }
   rule(:after){ str('nach') >> space }
   rule(:negate){ str('nicht') >> space }
-  rule(:part){ str('Anfang') | str('Mitte') | str('Ende') | str('1. Hälfte') | str('2. Hälfte') | str('1. Drittel') | str('2. Drittel') | str('3. Drittel') | str('1. Viertel') | str('2. Viertel') | str('3. Viertel') | str('4. Viertel') }
+  rule(:part){
+    str('Anfang') |
+    str('Mitte') |
+    str('Ende') |
+    str('1. Hälfte') |
+    str('2. Hälfte') |
+    str('1. Drittel') |
+    str('2. Drittel') |
+    str('3. Drittel') |
+    str('1. Viertel') |
+    str('2. Viertel') |
+    str('3. Viertel') |
+    str('4. Viertel')
+  }
 
   # Dating
 
-  rule(:century){ (approx >> space).maybe.as(:approx) >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc) }
+  rule(:century){
+    (approx >> space).maybe.as(:approx) >>
+    positive_number.as(:num) >> str('.').as(:cd) >> 
+    (space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc)).maybe
+  }
   rule(:year){ (approx >> space).maybe.as(:approx) >> whole_number_without_zero.as(:num) >> (space >> acbc).maybe.as(:acbc) }
   rule(:century_part){ part.as(:part) >> space >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc) }
   rule(:european_date){ day.as(:day) >> str('.') >> month.as(:month) >> str('.') >> whole_number.as(:yearnum) }
@@ -37,8 +58,12 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:century_interval){ century.as(:from) >> to >> century.as(:to) }
   rule(:before_year){ negate.maybe.as(:not) >> before >> year.as(:date) }
   rule(:after_year){ negate.maybe.as(:not) >> after >> year.as(:date) }
-  rule(:year_interval){ year.as(:from) >> to >> (year | unknown).as(:to) | (year | unknown).as(:from) >> to >> year.as(:to) }
+  rule(:year_interval){
+    year.as(:from) >> to >> (year | unknown).as(:to) |
+    (year | unknown).as(:from) >> to >> year.as(:to)
+  }
   rule(:before_century){ before >> century.as(:century) }
+
   rule(:interval){
     before_year.as(:before_year) |
       after_year.as(:after_year) |
@@ -47,6 +72,7 @@ class HistoricalDating::Parser < Parslet::Parser
       year_interval.as(:year_interval) |
       before_century.as(:before_century)
   }
+
   rule(:dating){
     interval.as(:interval) |
       century_part.as(:century_part) |

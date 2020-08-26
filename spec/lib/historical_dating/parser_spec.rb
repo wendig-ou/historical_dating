@@ -286,4 +286,99 @@ RSpec.describe HistoricalDating::Parser do
   it "should parse '-480'" do
     expect(subject.transform("-480")).to eql(from: Date.new(-480, 1, 1), to: Date.new(-480, 12, 31))
   end
+
+
+  # additional prometheus formats, see internal issue tracker at
+  # https://redmine.prometheus-srv.uni-koeln.de/issues/392
+
+  # it "should parse 'vor Mitte 5. Jahrhundert v. Chr.'" do
+  #   expect(subject.transform("vor Mitte 5. Jahrhundert v. Chr.")).to eql(from: Date.new(-549, 1, 1), to: Date.new(-450, 12, 31))
+  # end
+
+  # it "should parse 'zwischen 470 und 465 v. Chr.'" do
+  #   expect(subject.transform("zwischen 470 und 465 v. Chr.")).to eql(from: Date.new(-470, 1, 1), to: Date.new(-465, 12, 31))
+  # end
+
+  # it "should parse 'Ende 1. Viertel 5. Jahrhundert v. Chr.'" do
+  #   expect(subject.transform("Ende 1. Viertel 5. Jahrhundert v. Chr.")).to eql(from: Date.new(-479, 1, 1), to: Date.new(-475, 12, 31))
+  # end
+
+  # it "should parse 'Ende 4. / Anfang 3. Jahrhundert v. Chr.'" do
+  #   expect(subject.transform("Ende 4. / Anfang 3. Jahrhundert v. Chr.")).to eql(from: Date.new(-324, 1, 1), to: Date.new(-275, 12, 31))
+  # end
+
+  # it "should parse 'Ende 7./1. Hälfte 6. Jahrhundert v. Chr.'" do
+  #   expect(subject.transform("Ende 7./1. Hälfte 6. Jahrhundert v. Chr.")).to eql(from: Date.new(-624, 1, 1), to: Date.new(-550, 12, 31))
+  # end
+
+  # it "should parse 'Ende 1. / 2. Viertel 4. Jahrhundert n. Chr.'" do
+  #   expect(subject.transform("Ende 1. / 2. Viertel 4. Jahrhundert n. Chr.")).to eql(from: Date.new(320, 1, 1), to: Date.new(349, 12, 31))
+  # end
+
+  # it "should parse 'Wende 4./3. Jh. v. Chr.'" do
+  #   expect(subject.transform("Wende 4./3. Jh. v. Chr.")).to eql(from: Date.new(-309, 1, 1), to: Date.new(-290, 12, 31))
+  # end
+
+  # it "should parse '2./3. Viertel 4. Jahrhundert v. Chr.'" do
+  #   expect(subject.transform("2./3. Viertel 4. Jahrhundert v. Chr.")).to eql(from: Date.new(-374, 1, 1), to: Date.new(-325, 12, 31))
+  # end
+
+  # it "should parse '4. Viertel 7. / 1. Viertel 6. Jahrhundert v. Chr.'" do
+  #   expect(subject.transform("4. Viertel 7. / 1. Viertel 6. Jahrhundert v. Chr.")).to eql(from: Date.new(-624, 1, 1), to: Date.new(-575, 12, 31))
+  # end
+
+  # it "should parse 'zweite Hälfte 8. Jahrhundert v. Chr.'" do
+  #   expect(subject.transform("zweite Hälfte 8. Jahrhundert v. Chr.")).to eql(from: Date.new(-749, 1, 1), to: Date.new(-700, 12, 31))
+  # end
+
+  # it "should parse '2. Hälfte 4. / 1. Hälfte 3. Jahrhundert v. Chr.'" do
+  #   expect(subject.transform("2. Hälfte 4. / 1. Hälfte 3. Jahrhundert v. Chr.")).to eql(from: Date.new(-349, 1, 1), to: Date.new(-250, 12, 31))
+  # end
+
+  # it "should parse '2. Hälfte 7./ Anfang 6. Jahrhundert v. Chr.'" do
+  #   expect(subject.transform("2. Hälfte 7./ Anfang 6. Jahrhundert v. Chr.")).to eql(
+  #     from: Date.new(-649, 1, 1), to: Date.new(-575, 12, 31)
+  #   )
+  # end
+
+  it "should parse '430 - 420 v. Chr.'" do
+    expect(subject.transform("430 - 420 v. Chr.")).to eql(
+      from: Date.new(-430, 1, 1), to: Date.new(-420, 12, 31)
+    )
+  end
+
+  # I need to keep the ConedaKOR case in mind here: The lib is used to validate
+  # web input by users and while the semantics of this format make sense, it
+  # seems like a typo that we would like to prevent. We could add a "lax" flag
+  # to allow these cases. Or would you rather fix them in before handing it to
+  # the parser? In any case, I added a test for the version without the typo
+  # it "should parse '562/ 558 v. Chr.'" do
+  #   expect(subject.transform("562/ 558 v. Chr.")).to eql(
+  #     from: Date.new(-562, 1, 1), to: Date.new(-568, 12, 31)
+  #   )
+  # end
+
+  it "should parse '562/558 v. Chr.'" do
+    expect(subject.transform("562/558 v. Chr.")).to eql(
+      from: Date.new(-562, 1, 1), to: Date.new(-558, 12, 31)
+    )
+  end
+
+  it "should parse '26. - 23. Jahrhundert v. Chr.'" do
+    expect(subject.transform("26. - 23. Jahrhundert v. Chr.")).to eql(
+      from: Date.new(-2599, 1, 1), to: Date.new(-2200, 12, 31)
+    )
+  end
+
+  it "should parse '1895/97'" do
+    expect(subject.transform("1895/97")).to eql(
+      from: Date.new(1895, 1, 1), to: Date.new(1897, 12, 31)
+    )
+  end
+
+  it "should parse 'um 1829/30'" do
+    expect(subject.transform("um 1829/30")).to eql(
+      from: Date.new(1824, 1, 1), to: Date.new(1830, 12, 31)
+    )
+  end
 end
