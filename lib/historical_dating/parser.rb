@@ -15,8 +15,8 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:space){ str(' ').repeat(1, nil) }
   rule(:christ){ str('Chr.') | str('Christus') }
   rule(:age){ str('v.') | str('vor') | str('n.') | str('nach') }
-  rule(:acbc){ age >> space >> christ }
-  rule(:century_string){ str('Jahrhundert') | str('Jh.') }
+  rule(:acbc){ age >> space >> christ | str('BC') | str('AC') }
+  rule(:century_string){ str('Jahrhundert') | str('Jh.') | str('Jhd') }
   rule(:approx){ str('ca.') | str('um') | str('circa') }
   rule(:unknown){ str('?') }
   rule(:to){

@@ -287,7 +287,6 @@ RSpec.describe HistoricalDating::Parser do
     expect(subject.transform("-480")).to eql(from: Date.new(-480, 1, 1), to: Date.new(-480, 12, 31))
   end
 
-
   # additional prometheus formats, see internal issue tracker at
   # https://redmine.prometheus-srv.uni-koeln.de/issues/392
 
@@ -379,6 +378,42 @@ RSpec.describe HistoricalDating::Parser do
   it "should parse 'um 1829/30'" do
     expect(subject.transform("um 1829/30")).to eql(
       from: Date.new(1824, 1, 1), to: Date.new(1830, 12, 31)
+    )
+  end
+
+  it "should parse '4000 - 3000 BC'" do
+    expect(subject.transform("4000 - 3000 BC")).to eql(
+      from: Date.new(-4000, 1, 1), to: Date.new(-3000, 12, 31)
+    )
+  end
+
+  it "should parse '3100 BC'" do
+    expect(subject.transform("3100 BC")).to eql(
+      from: Date.new(-3100, 1, 1), to: Date.new(-3100, 12, 31)
+    )
+  end
+
+  it "should parse 'um 3100 BC'" do
+    expect(subject.transform("um 3100 BC")).to eql(
+      from: Date.new(-3105, 1, 1), to: Date.new(-3095, 12, 31)
+    )
+  end
+
+  it "should parse '2740 bis 2705 BC'" do
+    expect(subject.transform("2740 bis 2705 BC")).to eql(
+      from: Date.new(-2740, 1, 1), to: Date.new(-2705, 12, 31)
+    )
+  end
+
+  it "should parse 'um 2445 - 2414 BC'" do
+    expect(subject.transform("um 2445 - 2414 BC")).to eql(
+      from: Date.new(-2450, 1, 1), to: Date.new(-2414, 12, 31)
+    )
+  end
+
+  it "should parse 'nach 2221 BC'" do
+    expect(subject.transform("nach 2221 BC")).to eql(
+      from: Date.new(-2221, 1, 1), to: Date.new(-1797, 12, 31)
     )
   end
 end

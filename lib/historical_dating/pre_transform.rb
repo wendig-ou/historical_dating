@@ -1,6 +1,6 @@
 class HistoricalDating::PreTransform < Parslet::Transform
   rule(from: subtree(:from), to: subtree(:to)) do
-    if to[:acbc] && to[:acbc].match(/(vor|v.) (Chr.|Christus)/)
+    if to[:acbc] && (to[:acbc].match(/(vor|v.) (Chr.|Christus)/) || to[:acbc].match(/BC/))
       from[:acbc] = to[:acbc]
     end
 
