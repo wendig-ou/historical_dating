@@ -38,8 +38,8 @@ RSpec.describe HistoricalDating::Parser do
     expect(subject.christ).to parse('Christus')
     expect(subject.christ).to parse('Chr.')
 
-    expect(subject.age).to parse('v.')
-    expect(subject.age).to parse('vor')
+    expect(subject.age_before).to parse('v.')
+    expect(subject.age_before).to parse('vor')
   end
 
   it "should parse year numbers" do
@@ -47,7 +47,7 @@ RSpec.describe HistoricalDating::Parser do
     expect(subject.year).to parse('2000 v. Chr.')
     expect(subject.year).to parse('1')
     expect(subject.year).to parse('7 vor Christus')
-    expect(subject.year).not_to parse('0')
+    expect(subject.year).to parse('0')
   end
 
   it "should parse century strings" do
@@ -414,6 +414,174 @@ RSpec.describe HistoricalDating::Parser do
   it "should parse 'nach 2221 BC'" do
     expect(subject.transform("nach 2221 BC")).to eql(
       from: Date.new(-2221, 1, 1), to: Date.new(-1797, 12, 31)
+    )
+  end
+
+  it "should parse '150 - 60 v. Chr.'" do
+    expect(subject.transform("150 - 60 v. Chr.")).to eql(
+      from: Date.new(-150, 1, 1), to: Date.new(-60, 12, 31)
+    )
+  end
+
+  it "should parse 'Ca. 530 v. Chr.'" do
+    expect(subject.transform("Ca. 530 v. Chr.")).to eql(
+      from: Date.new(-535, 1, 1), to: Date.new(-525, 12, 31)
+    )
+  end
+
+  it "should parse 'Um 100 v. Chr.'" do
+    expect(subject.transform("Um 100 v. Chr.")).to eql(
+      from: Date.new(-105, 1, 1), to: Date.new(-95, 12, 31)
+    )
+  end
+
+  it "should parse '40/ 50 n. Chr.'" do
+    expect(subject.transform("40/ 50 n. Chr.")).to eql(
+      from: Date.new(40, 1, 1), to: Date.new(50, 12, 31)
+    )
+  end
+
+  it "should parse '100- 50 v. Chr.'" do
+    expect(subject.transform("100- 50 v. Chr.")).to eql(
+      from: Date.new(-100, 1, 1), to: Date.new(-50, 12, 31)
+    )
+  end
+
+  it "should parse 'ab 1831'" do
+    expect(subject.transform("ab 1831")).to eql(
+      from: Date.new(1831, 1, 1), to: Date.new(1849, 12, 31)
+    )
+  end
+
+  it "should parse '2. Jhd - 3. Jhd'" do
+    expect(subject.transform("2. Jhd - 3. Jhd")).to eql(
+      from: Date.new(100, 1, 1), to: Date.new(299, 12, 31)
+    )
+  end
+
+  it "should parse '2. - 3. Jhd'" do
+    expect(subject.transform("2. - 3. Jhd")).to eql(
+      from: Date.new(100, 1, 1), to: Date.new(299, 12, 31)
+    )
+  end
+
+  it "should parse '0 - 50'" do
+    expect(subject.transform("0 - 50")).to eql(
+      from: Date.new(0, 1, 1), to: Date.new(50, 12, 31)
+    )
+  end
+
+  it "should parse '1. Jhd'" do
+    expect(subject.transform("1. Jhd")).to eql(
+      from: Date.new(0, 1, 1), to: Date.new(99, 12, 31)
+    )
+  end
+
+  it "should parse '4. Jhd. BC'" do
+    expect(subject.transform("4. Jhd. BC")).to eql(
+      from: Date.new(-399, 1, 1), to: Date.new(-300, 12, 31)
+    )
+  end
+
+  it "should parse '4. Jhd. - 3. Jhd BC'" do
+    expect(subject.transform("4. Jhd. - 3. Jhd BC")).to eql(
+      from: Date.new(-399, 1, 1), to: Date.new(-200, 12, 31)
+    )
+  end
+
+  it "should parse '7. Jhd BC - 6. Jhd. BC'" do
+    expect(subject.transform("7. Jhd BC - 6. Jhd. BC")).to eql(
+      from: Date.new(-699, 1, 1), to: Date.new(-500, 12, 31)
+    )
+  end
+
+  it "should parse '500 - 490 Bc'" do
+    expect(subject.transform("500 - 490 Bc")).to eql(
+      from: Date.new(-500, 1, 1), to: Date.new(-490, 12, 31)
+    )
+  end
+
+  it "should parse '15 Jh'" do
+    expect(subject.transform("15 Jh")).to eql(
+      from: Date.new(1400, 1, 1), to: Date.new(1499, 12, 31)
+    )
+  end
+
+  it "should parse '17. jh.'" do
+    expect(subject.transform("17. jh.")).to eql(
+      from: Date.new(1600, 1, 1), to: Date.new(1699, 12, 31)
+    )
+  end
+
+  it "should parse '2 - 3 Jhd'" do
+    expect(subject.transform("2 - 3 Jhd")).to eql(
+      from: Date.new(100, 1, 1), to: Date.new(299, 12, 31)
+    )
+  end
+
+  it "should parse 'von 1509 bis 1510'" do
+    expect(subject.transform("von 1509 bis 1510")).to eql(
+      from: Date.new(1509, 1, 1), to: Date.new(1510, 12, 31)
+    )
+  end
+
+  it "should parse 'von 14. Jh bis 15. Jh.'" do
+    expect(subject.transform("von 14. Jh bis 15. Jh.")).to eql(
+      from: Date.new(1300, 1, 1), to: Date.new(1499, 12, 31)
+    )
+  end
+
+  it "should parse 'zwischen 1534 - 1539'" do
+    expect(subject.transform("zwischen 1534 - 1539")).to eql(
+      from: Date.new(1534, 1, 1), to: Date.new(1539, 12, 31)
+    )
+  end
+
+  it "should parse 'after 1979'" do
+    expect(subject.transform("after 1979")).to eql(
+      from: Date.new(1979, 1, 1), to: Date.new(1983, 12, 31)
+    )
+  end
+
+  it "should parse '1985-02'" do
+    expect(subject.transform("1985-02")).to eql(
+      from: Date.new(1985, 2, 1), to: Date.new(1985, 2, 28)
+    )
+  end
+
+  it "should parse '1987-09'" do
+    expect(subject.transform("1987-09")).to eql(
+      from: Date.new(1987, 9, 1), to: Date.new(1987, 9, 30)
+    )
+  end
+
+  it "should parse '1987-12'" do
+    expect(subject.transform("1987-12")).to eql(
+      from: Date.new(1987, 12, 1), to: Date.new(1987, 12, 31)
+    )
+  end
+
+  it "should parse '10-06-1981'" do
+    expect(subject.transform("10-06-1981")).to eql(
+      from: Date.new(1981, 6, 10), to: Date.new(1981, 6, 10)
+    )
+  end
+
+  it "should parse '06.1951'" do
+    expect(subject.transform("06.1951")).to eql(
+      from: Date.new(1951, 6, 1), to: Date.new(1951, 6, 30)
+    )
+  end
+
+  it "should parse '1436 - 1449 AD'" do
+    expect(subject.transform("1436 - 1449 AD")).to eql(
+      from: Date.new(1436, 1, 1), to: Date.new(1449, 12, 31)
+    )
+  end
+
+  it "should parse 'Zwischen 1450 und 1500'" do
+    expect(subject.transform("Zwischen 1450 und 1500")).to eql(
+      from: Date.new(1450, 1, 1), to: Date.new(1500, 12, 31)
     )
   end
 end
