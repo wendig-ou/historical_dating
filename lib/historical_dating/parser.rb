@@ -50,7 +50,7 @@ class HistoricalDating::Parser < Parslet::Parser
     str('jh')
   }
   rule(:approx){ str('ca.') | str('Ca.') | str('ca') | str('um') | str('Um') | str('circa') }
-  rule(:unknown){ str('?') }
+  rule(:unknown){ str('?') | str('unbekannt') | str('onbekend') }
   rule(:to_characters){
     str('bis') | str('-') | str('/') | str('und')
   }
