@@ -449,7 +449,7 @@ RSpec.describe HistoricalDating::Parser do
 
   it "should parse 'ab 1831'" do
     expect(subject.transform("ab 1831")).to eql(
-      from: Date.new(1831, 1, 1), to: Date.new(1849, 12, 31)
+      from: Date.new(1831, 1, 1), to: Date.new(1850, 12, 31)
     )
   end
 
@@ -582,6 +582,18 @@ RSpec.describe HistoricalDating::Parser do
   it "should parse 'Zwischen 1450 und 1500'" do
     expect(subject.transform("Zwischen 1450 und 1500")).to eql(
       from: Date.new(1450, 1, 1), to: Date.new(1500, 12, 31)
+    )
+  end
+
+  it "should parse '1700 - 1800'" do
+    expect(subject.transform("1700 und 1800")).to eql(
+      from: Date.new(1700, 1, 1), to: Date.new(1800, 12, 31)
+    )
+  end
+
+  it "should parse '5/10/1862'" do
+    expect(subject.transform("5/10/1862")).to eql(
+      from: Date.new(1862, 10, 5), to: Date.new(1862, 10, 05)
     )
   end
 end

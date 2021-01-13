@@ -102,12 +102,12 @@ class HistoricalDating::Parser < Parslet::Parser
   }
   rule(:century_part){ part.as(:part) >> space >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc) }
   rule(:european_date){
-    (day.as(:day) >> (str('.') | str('-')) >>
+    (day.as(:day) >> (str('.') | str('-') | str('/')) >>
     month.as(:month) >>
-    (str('.') | str('-')) >>
+    (str('.') | str('-') | str('/')) >>
     whole_number.as(:yearnum)) |
     (month.as(:month) >>
-    (str('.') | str('-')) >>
+    (str('.') | str('-') | str('/')) >>
     whole_number.as(:yearnum))
   }
   rule(:machine_date){ whole_number.as(:yearnum) >> (str('.') | str('-')) >> month.as(:month) >> ((str('.') | str('-')) >> day.as(:day)).maybe }
@@ -124,10 +124,8 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:year_interval){
     prefix.maybe >>
     (year | unknown).as(:from) >>
-    ((to >>
-    (more_than_two_digit_year | unknown).as(:to)) |
-    (to_two_digit_year >>
-    two_digit_year.as(:to)))
+    ((to >> (more_than_two_digit_year | unknown).as(:to)) |
+    (to_two_digit_year >> two_digit_year.as(:to)))
   }
   rule(:before_century){ before >> century.as(:century) }
 
