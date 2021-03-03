@@ -544,18 +544,24 @@ RSpec.describe HistoricalDating::Parser do
   end
 
   it "should parse '1985-02'" do
+    skip 'Ambiguous date. "-" is used for year interval right now.'
+
     expect(subject.transform("1985-02")).to eql(
       from: Date.new(1985, 2, 1), to: Date.new(1985, 2, 28)
     )
   end
 
   it "should parse '1987-09'" do
+    skip 'Ambiguous date. "-" is used for year interval right now.'
+
     expect(subject.transform("1987-09")).to eql(
       from: Date.new(1987, 9, 1), to: Date.new(1987, 9, 30)
     )
   end
 
   it "should parse '1987-12'" do
+    skip 'Ambiguous date. "-" is used for year interval right now.'
+
     expect(subject.transform("1987-12")).to eql(
       from: Date.new(1987, 12, 1), to: Date.new(1987, 12, 31)
     )
@@ -594,6 +600,30 @@ RSpec.describe HistoricalDating::Parser do
   it "should parse '5/10/1862'" do
     expect(subject.transform("5/10/1862")).to eql(
       from: Date.new(1862, 10, 5), to: Date.new(1862, 10, 05)
+    )
+  end
+
+  it "should parse '2.-3. Jh.'" do
+    expect(subject.transform('2.-3. Jh.')).to eql(
+      from: Date.new(100, 1, 1), to: Date.new(299, 12, 31)
+    )
+  end
+
+  it "should parse '2.-3. Jh. n. Chr.'" do
+    expect(subject.transform('2.-3. Jh. n. Chr.')).to eql(
+      from: Date.new(100, 1, 1), to: Date.new(299, 12, 31)
+    )
+  end
+
+  it "should parse '1885–1895'" do
+    expect(subject.transform('1885–1895')).to eql(
+      from: Date.new(1885, 1, 1), to: Date.new(1895, 12, 31)
+    )
+  end
+
+  it "should parse '1959-60'" do
+    expect(subject.transform('1959-60')).to eql(
+      from: Date.new(1959, 1, 1), to: Date.new(1960, 12, 31)
     )
   end
 end

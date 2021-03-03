@@ -52,16 +52,16 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:approx){ str('ca.') | str('Ca.') | str('ca') | str('um') | str('Um') | str('circa') }
   rule(:unknown){ str('?') | str('unbekannt') | str('onbekend') }
   rule(:to_characters){
-    str('bis') | str('-') | str('/') | str('und')
+    str('bis') | str('-') | str('–') | str('/') | str('und')
   }
   rule(:to_two_digit_year){
     (space >> to_characters >> space) |
     (to_characters >> space) |
     (space >> to_characters) |
-    str('/')
+    str('/') | str('-')
   }
   rule(:to){
-    to_two_digit_year | str('-')
+    to_two_digit_year | str('-') | str('–')
   }
   rule(:before){ (str('vor') | str('Vor') | str('before')) >> space }
   rule(:after){ (str('Nach') | str('nach') | str('ab') | str('after')) >> space }
@@ -91,7 +91,7 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:century){
     (approx >> space).maybe.as(:approx) >>
     natural_number.as(:num) >>
-    ((str('.').as(:cd) >> (space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc)).maybe) |
+    ((str('.').as(:cd) >> space.maybe >> century_string.as(:cs).maybe >> space.maybe >> acbc.maybe.as(:acbc)) |
     (space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc)))
   }
   rule(:century_number){
@@ -110,7 +110,7 @@ class HistoricalDating::Parser < Parslet::Parser
     (str('.') | str('-') | str('/')) >>
     whole_number.as(:yearnum))
   }
-  rule(:machine_date){ whole_number.as(:yearnum) >> (str('.') | str('-')) >> month.as(:month) >> ((str('.') | str('-')) >> day.as(:day)).maybe }
+  rule(:machine_date){ whole_number.as(:yearnum) >> (str('.') | str('-') | str('–')) >> month.as(:month) >> (str('.') | str('-')) >> day.as(:day) }
   rule(:date){ european_date | machine_date }
   rule(:date_interval){ date.as(:from) >> to >> date.as(:to) }
   rule(:century_interval){
