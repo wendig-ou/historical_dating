@@ -15,7 +15,7 @@ class HistoricalDating::Transform < Parslet::Transform
     when "4. Viertel" then [75, 0]
     end
 
-    if acbc.nil? || acbc.match(/(nach|n.) (Chr.|Christus)/)
+    if HistoricalDating::Transform.ac?(acbc)
       {
         :from => Date.new((num.to_i - 1) * 100 + modifier.first, 1, 1),
         :to => Date.new((num.to_i - 1) * 100 + 99 - modifier.last, 12, 31)
@@ -29,7 +29,7 @@ class HistoricalDating::Transform < Parslet::Transform
   end
 
   rule(:num => simple(:num), :approx => simple(:approx), :acbc => simple(:acbc), :cs => simple(:cs)) do
-    result = if acbc.nil? || acbc.match(/(nach|n.) (Chr.|Christus)/)
+    result = if HistoricalDating::Transform.ac?(acbc)
       {
         :from => Date.new((num.to_i - 1) * 100, 1, 1),
         :to => Date.new((num.to_i - 1) * 100 + 99, 12, 31)
@@ -52,7 +52,7 @@ class HistoricalDating::Transform < Parslet::Transform
   rule(:num => simple(:num), :approx => simple(:approx), :acbc => simple(:acbc)) do
     modifier = (approx ? 5 : 0)
 
-    if acbc.nil? || acbc.match(/(nach|n.) (Chr.|Christus)/)
+    if HistoricalDating::Transform.ac?(acbc)
       {
         :from => Date.new(num.to_i - modifier, 1, 1),
         :to => Date.new(num.to_i + modifier, 12, 31)
@@ -65,19 +65,19 @@ class HistoricalDating::Transform < Parslet::Transform
     end
   end
 
-  rule(from_year: simple(:from_year), to_year: simple(:to_year), acbc: simple(:acbc)) do
-    if acbc.nil? || acbc.match(/(nach|n.) (Chr.|Christus)/)
-      {
-        :from => Date.new(from_year.to_i, 1, 1),
-        :to => Date.new(to_year.to_i, 12, 31)
-      }
-    else
-      {
-        :from => Date.new(to_year.to_i * -1, 1, 1),
-        :to => Date.new(from_year.to_i * -1, 12, 31)
-      }
-    end
-  end
+  # rule(from_year: simple(:from_year), to_year: simple(:to_year), acbc: simple(:acbc)) do
+  #   if acbc.nil? || acbc.match(/(nach|n.) (Chr.|Christus)/)
+  #     {
+  #       :from => Date.new(from_year.to_i, 1, 1),
+  #       :to => Date.new(to_year.to_i, 12, 31)
+  #     }
+  #   else
+  #     {
+  #       :from => Date.new(to_year.to_i * -1, 1, 1),
+  #       :to => Date.new(from_year.to_i * -1, 12, 31)
+  #     }
+  #   end
+  # end
 
   rule(:day => simple(:day), :month => simple(:month), :yearnum => simple(:yearnum)) do
     if !Date.leap?(yearnum.to_i) && month.to_i == 2 && day.to_i == 29
@@ -87,6 +87,13 @@ class HistoricalDating::Transform < Parslet::Transform
     {
       :from => Date.new(yearnum.to_i, month.to_i, day.to_i),
       :to => Date.new(yearnum.to_i, month.to_i, day.to_i),
+    }
+  end
+
+  rule(:month => simple(:month), :yearnum => simple(:yearnum)) do
+    {
+      :from => Date.new(yearnum.to_i, month.to_i, 1),
+      :to => Date.new(yearnum.to_i, month.to_i, -1),
     }
   end
 
@@ -148,6 +155,17 @@ class HistoricalDating::Transform < Parslet::Transform
     else
       HistoricalDating::Transform.open_end(year)
     end
+  end
+
+  rule(special: subtree(:a)) do
+    result = {
+      from: Date.new(a[:from_year].to_i, 1, 1),
+      to: Date.new(a[:to_year].to_i, 12, 31)
+    }
+  end
+
+  def self.ac?(acbc)
+    acbc.nil? || acbc.match(/(nach|n.) (Chr.|Christus)/) || acbc.match(/AC|Ac|Anno Domini|A. D.|AD/)
   end
 
   def self.open_start(year)

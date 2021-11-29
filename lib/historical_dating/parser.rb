@@ -3,29 +3,68 @@ class HistoricalDating::Parser < Parslet::Parser
 
   rule(:zero){ str '0' }
   rule(:natural_number){ match['1-9'] >> match['0-9'].repeat }
+  rule(:two_digit_natural_number){ match['1-9'] >> match['0-9'].repeat(0,1) }
+  rule(:more_than_two_digit_natural_number){ match['1-9'] >> match['0-9'].repeat(2,nil) }
   rule(:positive_number){ zero | natural_number }
+  rule(:two_digit_positive_number){ zero | two_digit_natural_number }
+  rule(:more_than_two_digit_positive_number){ zero | more_than_two_digit_natural_number }
   rule(:minus){ match '-' }
   rule(:whole_number_without_zero){ natural_number | minus >> natural_number }
+  rule(:whole_number_with_zero){ positive_number | minus >> natural_number }
+  rule(:two_digit_whole_number_with_zero){ two_digit_positive_number | minus >> two_digit_natural_number }
+  rule(:more_than_two_digit_whole_number_with_zero){ more_than_two_digit_positive_number | minus >> more_than_two_digit_natural_number }
   rule(:whole_number){ positive_number | minus >> natural_number }
-  rule(:day){ match['1-2'] >> match['0-9'] | str('3') >> match['0-1'] | match['1-9'] | str('0') >> match['1-9'] }
-  rule(:month){ str('1') >> match['0-2'] | match['1-9'] | str('0') >> match['1-9'] }
 
   # Utility
 
   rule(:space){ str(' ').repeat(1, nil) }
+  rule(:prefix){ (str('von') | str('zwischen') | str('Zwischen')) >> space }
   rule(:christ){ str('Chr.') | str('Christus') }
-  rule(:age){ str('v.') | str('vor') | str('n.') | str('nach') }
-  rule(:acbc){ age >> space >> christ }
-  rule(:century_string){ str('Jahrhundert') | str('Jh.') }
-  rule(:approx){ str('ca.') | str('um') | str('circa') }
-  rule(:unknown){ str('?') }
-  rule(:to){
-    ((space >> (str('bis') | str('-') | str('/')) >> space) |
-    str('-') |
-    str('/'))
+  rule(:age_before){ str('v.') | str('vor') }
+  rule(:age_after){ str('n.') | str('nach') }
+  rule(:ac){
+    age_after >> space >> christ |
+    str('AC') |
+    str('Ac') |
+    str('Anno Domini') |
+    str('A. D.') |
+    str('AD')
   }
-  rule(:before){ str('vor') >> space }
-  rule(:after){ str('nach') >> space }
+  rule(:bc){
+    age_before >> space >> christ |
+    str('BC') |
+    str('Bc')
+  }
+  rule(:acbc){
+    ac | bc
+  }
+  rule(:century_string){
+    str('Jahrhundert') |
+    str('Jhd.') |
+    str('jhd.') |
+    str('Jhd') |
+    str('jhd') |
+    str('Jh.') |
+    str('jh.') |
+    str('Jh') |
+    str('jh')
+  }
+  rule(:approx){ str('ca.') | str('Ca.') | str('ca') | str('um') | str('Um') | str('circa') }
+  rule(:unknown){ str('?') | str('unbekannt') | str('onbekend') }
+  rule(:to_characters){
+    str('bis') | str('-') | str('–') | str('/') | str('und')
+  }
+  rule(:to_two_digit_year){
+    (space >> to_characters >> space) |
+    (to_characters >> space) |
+    (space >> to_characters) |
+    str('/') | str('-')
+  }
+  rule(:to){
+    to_two_digit_year | str('-') | str('–')
+  }
+  rule(:before){ (str('vor') | str('Vor') | str('before')) >> space }
+  rule(:after){ (str('Nach') | str('nach') | str('ab') | str('after')) >> space }
   rule(:negate){ str('nicht') >> space }
   rule(:part){
     str('Anfang') |
@@ -42,44 +81,78 @@ class HistoricalDating::Parser < Parslet::Parser
     str('4. Viertel')
   }
 
+  # Special cases / conflicts with existing rules
+
+  rule(:uncertain_from_range){
+    natural_number.as(:from_year) >> str('/') >> whole_number >>
+    space.maybe >> to_characters >> space.maybe >>
+    natural_number.as(:to_year)
+  }
+
   # Dating
 
+  rule(:day){ match['1-2'] >> match['0-9'] | str('3') >> match['0-1'] | match['1-9'] | str('0') >> match['1-9'] }
+  rule(:month){ (str('0') >> match['1-9']) | (str('1') >> match['0-2']) | match['1-9'] }
+  rule(:two_digit_year){ (approx >> space).maybe.as(:approx) >> two_digit_whole_number_with_zero.as(:num) >> (space >> acbc).maybe.as(:acbc) }
+  rule(:more_than_two_digit_year){ (approx >> space).maybe.as(:approx) >> more_than_two_digit_whole_number_with_zero.as(:num) >> (space >> acbc).maybe.as(:acbc) }
+  rule(:year){ (approx >> space).maybe.as(:approx) >> whole_number_with_zero.as(:num) >> (space >> acbc).maybe.as(:acbc) }
   rule(:century){
     (approx >> space).maybe.as(:approx) >>
-    positive_number.as(:num) >> str('.').as(:cd) >> 
-    (space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc)).maybe
+    natural_number.as(:num) >>
+    ((str('.').as(:cd) >> space.maybe >> century_string.as(:cs).maybe >> space.maybe >> acbc.maybe.as(:acbc)) |
+    (space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc)))
   }
-  rule(:year){ (approx >> space).maybe.as(:approx) >> whole_number_without_zero.as(:num) >> (space >> acbc).maybe.as(:acbc) }
-  rule(:uncertain_year){ whole_number_without_zero.as(:from_year) >> str('/') >> whole_number.as(:to_year) >> (space >> acbc).maybe.as(:acbc) }
+  rule(:century_number){
+    (approx >> space).maybe.as(:approx) >>
+    natural_number.as(:num) >>
+    (space >> century_string).maybe.as(:cs) >>
+    (space >> acbc).maybe.as(:acbc)
+  }
   rule(:century_part){ part.as(:part) >> space >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc) }
-  rule(:european_date){ day.as(:day) >> str('.') >> month.as(:month) >> str('.') >> whole_number.as(:yearnum) }
-  rule(:machine_date){ whole_number.as(:yearnum) >> (str('.') | str('-')) >> month.as(:month) >> (str('.') | str('-')) >> day.as(:day) }
+  rule(:european_date){
+    (day.as(:day) >> (str('.') | str('-') | str('/')) >>
+    month.as(:month) >>
+    (str('.') | str('-') | str('/')) >>
+    whole_number.as(:yearnum)) |
+    (month.as(:month) >>
+    (str('.') | str('-') | str('/')) >>
+    whole_number.as(:yearnum))
+  }
+  rule(:machine_date){ whole_number.as(:yearnum) >> (str('.') | str('-') | str('–')) >> month.as(:month) >> (str('.') | str('-')) >> day.as(:day) }
   rule(:date){ european_date | machine_date }
   rule(:date_interval){ date.as(:from) >> to >> date.as(:to) }
-  rule(:century_interval){ century.as(:from) >> to >> century.as(:to) }
+  rule(:century_interval){
+    prefix.maybe >>
+    (century.as(:from) | century_number.as(:from)) >>
+    to >>
+    century.as(:to)
+  }
   rule(:before_year){ negate.maybe.as(:not) >> before >> year.as(:date) }
   rule(:after_year){ negate.maybe.as(:not) >> after >> year.as(:date) }
   rule(:year_interval){
-    (uncertain_year | year).as(:from) >> to >> (year | unknown).as(:to) |
-    (year | unknown).as(:from) >> to >> year.as(:to)
+    prefix.maybe >>
+    (year | unknown).as(:from) >>
+    ((to >> (more_than_two_digit_year | unknown).as(:to)) |
+    (to_two_digit_year >> two_digit_year.as(:to)))
   }
   rule(:before_century){ before >> century.as(:century) }
 
   rule(:interval){
     before_year.as(:before_year) |
-      after_year.as(:after_year) |
-      date_interval.as(:date_interval) |
-      century_interval.as(:century_interval) |
-      year_interval.as(:year_interval) |
-      before_century.as(:before_century)
+    after_year.as(:after_year) |
+    date_interval.as(:date_interval) |
+    century_interval.as(:century_interval) |
+    year_interval.as(:year_interval) |
+    before_century.as(:before_century)
   }
 
   rule(:dating){
     interval.as(:interval) |
-      century_part.as(:century_part) |
-      century.as(:century) |
-      date.as(:date) |
-      year.as(:year)
+    century_part.as(:century_part) |
+    century.as(:century) |
+    date.as(:date) |
+    year.as(:year) |
+    uncertain_from_range.as(:special)
   }
 
   root(:dating)
