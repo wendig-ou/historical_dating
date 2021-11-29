@@ -381,4 +381,12 @@ RSpec.describe HistoricalDating::Parser do
       from: Date.new(1824, 1, 1), to: Date.new(1830, 12, 31)
     )
   end
+
+  it "should parse '1520/21 bis 1589'" do
+    expect(subject.uncertain_year).to parse('1520/21')
+
+    expect(subject.transform('1520/21 bis 1589')).to eql(
+      from: Date.new(1520, 1, 1), to: Date.new(1589, 12, 31)
+    )
+  end
 end

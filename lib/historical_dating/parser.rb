@@ -50,6 +50,7 @@ class HistoricalDating::Parser < Parslet::Parser
     (space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc)).maybe
   }
   rule(:year){ (approx >> space).maybe.as(:approx) >> whole_number_without_zero.as(:num) >> (space >> acbc).maybe.as(:acbc) }
+  rule(:uncertain_year){ whole_number_without_zero.as(:from_year) >> str('/') >> whole_number.as(:to_year) >> (space >> acbc).maybe.as(:acbc) }
   rule(:century_part){ part.as(:part) >> space >> positive_number.as(:num) >> str('.') >> space >> century_string.as(:cs) >> (space >> acbc).maybe.as(:acbc) }
   rule(:european_date){ day.as(:day) >> str('.') >> month.as(:month) >> str('.') >> whole_number.as(:yearnum) }
   rule(:machine_date){ whole_number.as(:yearnum) >> (str('.') | str('-')) >> month.as(:month) >> (str('.') | str('-')) >> day.as(:day) }
@@ -59,7 +60,7 @@ class HistoricalDating::Parser < Parslet::Parser
   rule(:before_year){ negate.maybe.as(:not) >> before >> year.as(:date) }
   rule(:after_year){ negate.maybe.as(:not) >> after >> year.as(:date) }
   rule(:year_interval){
-    year.as(:from) >> to >> (year | unknown).as(:to) |
+    (uncertain_year | year).as(:from) >> to >> (year | unknown).as(:to) |
     (year | unknown).as(:from) >> to >> year.as(:to)
   }
   rule(:before_century){ before >> century.as(:century) }

@@ -65,6 +65,20 @@ class HistoricalDating::Transform < Parslet::Transform
     end
   end
 
+  rule(from_year: simple(:from_year), to_year: simple(:to_year), acbc: simple(:acbc)) do
+    if acbc.nil? || acbc.match(/(nach|n.) (Chr.|Christus)/)
+      {
+        :from => Date.new(from_year.to_i, 1, 1),
+        :to => Date.new(to_year.to_i, 12, 31)
+      }
+    else
+      {
+        :from => Date.new(to_year.to_i * -1, 1, 1),
+        :to => Date.new(from_year.to_i * -1, 12, 31)
+      }
+    end
+  end
+
   rule(:day => simple(:day), :month => simple(:month), :yearnum => simple(:yearnum)) do
     if !Date.leap?(yearnum.to_i) && month.to_i == 2 && day.to_i == 29
       raise HistoricalDating::Error.new('not_leap_year', year: yearnum.to_i)
