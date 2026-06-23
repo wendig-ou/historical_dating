@@ -11,6 +11,8 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/wendig-ou/historical_dating"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 
+  spec.licenses      = ['AGPL-3.0-or-later']
+
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
 
   spec.metadata["homepage_uri"] = spec.homepage
@@ -27,8 +29,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency 'parslet', '~> 2.0.0'
-  spec.add_runtime_dependency 'activesupport', '>= 3.0.0'
+  spec.add_runtime_dependency 'activesupport', '~> 6.1.4.1'
 
   spec.add_development_dependency 'rspec', '~> 3.9.0'
-  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry', '~> 0.16.0'
 end
