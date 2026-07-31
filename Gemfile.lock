@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     historical_dating (1.9.1)
-      activesupport (~> 6.1.4.1)
+      activesupport (>= 6.1)
       parslet (~> 2.0.0)
 
 GEM
